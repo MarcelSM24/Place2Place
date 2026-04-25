@@ -8,7 +8,7 @@
     "example:mock": "node examples/mock-directions/run-scenario.js",
     "example:mock:near": "node examples/mock-directions/run-scenario.js same-cell.json",
     "example:mock:far": "node examples/mock-directions/run-scenario.js different-zones.json",
-    "test": "brittle test.js"
+    "test": "brittle test.js mesh-simulation.test.js"
   },
   "dependencies": {
     "autobase": "^7.27.3",
@@ -19,5 +19,8 @@
     "h3-js": "latest",
     "hypercore": "latest",
     "hyperswarm": "latest"
+  },
+  "devDependencies": {
+    "autobase-test-helpers": "^3.1.0"
   }
 }
