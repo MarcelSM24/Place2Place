@@ -1,0 +1,16 @@
+# dependencies
+node_modules/
+**/node_modules/
+
+# macOS
+.DS_Store
+**/.DS_Store
+
+# large local map artifacts
+map.osm.pbf
+
+# valhalla local artifacts
+backend/native/valhalla-data/
+backend/native/valhalla-install/
+backend/native/valhalla-src/
+backend/native/valhalla-addon/node_modules/
