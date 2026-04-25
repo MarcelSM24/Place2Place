@@ -1,0 +1,45 @@
+{
+  "name": "boundary-handoff",
+  "topicNamespace": "place2place-example-boundary-handoff-v1",
+  "description": "One car oscillates across an H3 boundary while others stay pinned to each side.",
+  "tickMs": 1000,
+  "h3Resolution": 8,
+  "durationMs": 25000,
+  "interpolationStepsPerSegment": 6,
+  "cars": [
+    {
+      "id": "car-a-handoff",
+      "storageDir": "./backend/.data/examples/car-a-handoff",
+      "telemetryCoreName": "telemetry-car-a-handoff",
+      "routeWaypoints": [
+        { "lat": 40.7128, "lon": -74.006 },
+        { "lat": 40.73061, "lon": -73.935242 },
+        { "lat": 40.7129, "lon": -74.0058 },
+        { "lat": 40.7307, "lon": -73.9351 },
+        { "lat": 40.7128, "lon": -74.006 }
+      ]
+    },
+    {
+      "id": "car-b-topic1",
+      "storageDir": "./backend/.data/examples/car-b-topic1",
+      "telemetryCoreName": "telemetry-car-b-topic1",
+      "routeWaypoints": [
+        { "lat": 40.7127, "lon": -74.0062 },
+        { "lat": 40.7132, "lon": -74.0054 },
+        { "lat": 40.7136, "lon": -74.0048 },
+        { "lat": 40.7129, "lon": -74.0057 }
+      ]
+    },
+    {
+      "id": "car-c-topic2",
+      "storageDir": "./backend/.data/examples/car-c-topic2",
+      "telemetryCoreName": "telemetry-car-c-topic2",
+      "routeWaypoints": [
+        { "lat": 40.7305, "lon": -73.9354 },
+        { "lat": 40.7309, "lon": -73.9348 },
+        { "lat": 40.7313, "lon": -73.9342 },
+        { "lat": 40.7307, "lon": -73.935 }
+      ]
+    }
+  ]
+}

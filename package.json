@@ -8,6 +8,9 @@
     "example:mock": "node examples/mock-directions/run-scenario.js",
     "example:mock:near": "node examples/mock-directions/run-scenario.js same-cell.json",
     "example:mock:far": "node examples/mock-directions/run-scenario.js different-zones.json",
+    "example:mock:boundary": "node examples/mock-directions/run-scenario.js boundary-handoff.json",
+    "example:mock:ferry": "node examples/mock-directions/run-scenario.js message-ferry-chain.json",
+    "example:mock:churn": "node examples/mock-directions/run-scenario.js churn-flapping.json",
     "test": "brittle test.js mesh-simulation.test.js"
   },
   "dependencies": {

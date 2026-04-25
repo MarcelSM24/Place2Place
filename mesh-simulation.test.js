@@ -15,6 +15,7 @@ import { deriveDiscoveryTopic } from "./backend/src/swarm/topic.js";
 
 const require = createRequire(import.meta.url);
 const { sync } = require("autobase-test-helpers");
+const SCENARIO_DIR = path.resolve("./examples/mock-directions/scenarios");
 
 class TopicReplicationHarness {
   constructor() {
@@ -130,9 +131,43 @@ async function closePeers(peers) {
   );
 }
 
+async function propagateAcrossChain(peers) {
+  for (let i = 0; i < peers.length - 1; i++) {
+    await sync([peers[i].base, peers[i + 1].base], { checkHash: false });
+  }
+}
+
+async function loadScenario(filename) {
+  const raw = await fs.readFile(path.join(SCENARIO_DIR, filename), "utf8");
+  return JSON.parse(raw);
+}
+
+function getScenarioCar(scenario, id) {
+  const car = scenario.cars.find((entry) => entry.id === id);
+  if (!car) throw new Error(`Missing car '${id}' in scenario '${scenario.name}'`);
+  return car;
+}
+
+function topicFromScenarioCar(scenario, carId, waypointIndex = 0) {
+  const car = getScenarioCar(scenario, carId);
+  const waypoint = car.routeWaypoints[waypointIndex];
+  if (!waypoint) {
+    throw new Error(
+      `Missing waypoint index ${waypointIndex} for '${carId}' in '${scenario.name}'`
+    );
+  }
+
+  return deriveDiscoveryTopic(
+    { lat: waypoint.lat, lon: waypoint.lon },
+    scenario.h3Resolution,
+    scenario.topicNamespace ?? scenario.name
+  ).topicBuffer.toString("hex");
+}
+
 test("Dense urban cell: five peers converge to identical Autobase state", async (t) => {
   const peers = [];
   try {
+    const scenario = await loadScenario("same-cell.json");
     const peer0 = await createPeer("p0");
     peers.push(peer0);
     for (let i = 1; i < 5; i++) {
@@ -140,11 +175,7 @@ test("Dense urban cell: five peers converge to identical Autobase state", async 
     }
 
     const harness = new TopicReplicationHarness();
-    const topicHex = deriveDiscoveryTopic(
-      { lat: 40.7128, lon: -74.006 },
-      8,
-      "mesh-test"
-    ).topicBuffer.toString("hex");
+    const topicHex = topicFromScenarioCar(scenario, "car-a", 0);
 
     await t.test("join and authorize all peers", async (st) => {
       for (const peer of peers) harness.join(peer, topicHex);
@@ -188,9 +219,149 @@ test("Dense urban cell: five peers converge to identical Autobase state", async 
   }
 });
 
-test("Boundary handoff: peer rotates topics and continues writing", async (t) => {
+test("Churn/flapping: repeated join-leave cycles still converge", async (t) => {
   const peers = [];
   try {
+    const scenario = await loadScenario("churn-flapping.json");
+    const peerA = await createPeer("A");
+    const peerB = await createPeer("B", peerA.base.key);
+    const peerC = await createPeer("C", peerA.base.key);
+    peers.push(peerA, peerB, peerC);
+
+    const harness = new TopicReplicationHarness();
+    const topicHex = topicFromScenarioCar(scenario, "car-a-flap", 0);
+
+    await t.test("initial join and writer authorization", async (st) => {
+      harness.join(peerA, topicHex);
+      harness.join(peerB, topicHex);
+      harness.join(peerC, topicHex);
+
+      await appendAddWriterMessage(peerA.base, peerB.base.local.key);
+      await appendAddWriterMessage(peerA.base, peerC.base.local.key);
+      await sync([peerA.base, peerB.base, peerC.base]);
+      st.pass("all peers start fully synchronized");
+    });
+
+    await t.test("flapping cycles with ongoing writes", async (st) => {
+      for (let round = 0; round < 5; round++) {
+        const flappingPeer = round % 2 === 0 ? peerB : peerC;
+        harness.leave(flappingPeer, topicHex);
+
+        await appendTelemetryEvent(
+          peerA.base,
+          createSignedEvent({
+            timestamp: 1715003000000 + round,
+            edge_id: 8100 + round,
+            speed_kph: 35 + round,
+            confidence: 220,
+            flags: 0
+          })
+        );
+        await sync([peerA.base, round % 2 === 0 ? peerC.base : peerB.base], {
+          checkHash: false
+        });
+
+        harness.join(flappingPeer, topicHex);
+        await sync([peerA.base, peerB.base, peerC.base], { checkHash: false });
+      }
+      st.pass("churn did not interrupt replication");
+    });
+
+    await t.test("final convergence after churn", async (st) => {
+      const expected = await collectViewEvents(peerA.base);
+      st.is(expected.length, 5, "all churn-round events persisted");
+      st.alike(await collectViewEvents(peerB.base), expected, "peer B converges");
+      st.alike(await collectViewEvents(peerC.base), expected, "peer C converges");
+    });
+  } finally {
+    await closePeers(peers);
+  }
+});
+
+test("Boundary thrash: rapid topic oscillation maintains continuity", async (t) => {
+  const peers = [];
+  try {
+    const scenario = await loadScenario("boundary-handoff.json");
+    const peerA = await createPeer("A");
+    const peerB = await createPeer("B", peerA.base.key);
+    const peerC = await createPeer("C", peerA.base.key);
+    peers.push(peerA, peerB, peerC);
+
+    const harness = new TopicReplicationHarness();
+    const topic1 = topicFromScenarioCar(scenario, "car-a-handoff", 0);
+    const topic2 = topicFromScenarioCar(scenario, "car-a-handoff", 1);
+
+    await t.test("seed both boundary-side neighborhoods", async (st) => {
+      harness.join(peerA, topic1);
+      harness.join(peerB, topic1);
+      harness.join(peerC, topic2);
+
+      await appendAddWriterMessage(peerA.base, peerB.base.local.key);
+      await sync([peerA.base, peerB.base]);
+      st.pass("topic 1 seeded");
+    });
+
+    await t.test("oscillate A across boundary with writes", async (st) => {
+      const writes = [
+        { topic: topic1, edgeId: 8201, speed: 44 },
+        { topic: topic2, edgeId: 8202, speed: 46 },
+        { topic: topic1, edgeId: 8203, speed: 48 },
+        { topic: topic2, edgeId: 8204, speed: 50 }
+      ];
+
+      for (const step of writes) {
+        harness.leave(peerA, step.topic === topic1 ? topic2 : topic1);
+        harness.join(peerA, step.topic);
+
+        if (step.topic === topic2) {
+          await appendAddWriterMessage(peerA.base, peerC.base.local.key);
+          await sync([peerA.base, peerC.base], { checkHash: false });
+        } else {
+          await sync([peerA.base, peerB.base], { checkHash: false });
+        }
+
+        await appendTelemetryEvent(
+          peerA.base,
+          createSignedEvent({
+            timestamp: 1715004000000 + step.edgeId,
+            edge_id: step.edgeId,
+            speed_kph: step.speed,
+            confidence: 225,
+            flags: 1
+          })
+        );
+        await sync([peerA.base, step.topic === topic1 ? peerB.base : peerC.base], {
+          checkHash: false
+        });
+      }
+      st.ok(peerA.base.local.length >= 4, "local writer stayed continuous through thrash");
+    });
+
+    await t.test("both sides eventually observe full history", async (st) => {
+      harness.leave(peerA, topic2);
+      harness.join(peerA, topic1);
+      await sync([peerA.base, peerB.base], { checkHash: false });
+      harness.leave(peerA, topic1);
+      harness.join(peerA, topic2);
+      await sync([peerA.base, peerC.base], { checkHash: false });
+
+      const expectedEdgeIds = [8201, 8202, 8203, 8204];
+      const edgeIdsB = (await collectViewEvents(peerB.base)).map((e) => e.edge_id);
+      const edgeIdsC = (await collectViewEvents(peerC.base)).map((e) => e.edge_id);
+      for (const id of expectedEdgeIds) {
+        st.ok(edgeIdsB.includes(id), `peer B has event ${id}`);
+        st.ok(edgeIdsC.includes(id), `peer C has event ${id}`);
+      }
+    });
+  } finally {
+    await closePeers(peers);
+  }
+});
+
+test("Multi-hop chain: A->B->C->D relay across sparse topology", async (t) => {
+  const peers = [];
+  try {
+    const scenario = await loadScenario("message-ferry-chain.json");
     const peerA = await createPeer("A");
     const peerB = await createPeer("B", peerA.base.key);
     const peerC = await createPeer("C", peerA.base.key);
@@ -198,16 +369,64 @@ test("Boundary handoff: peer rotates topics and continues writing", async (t) =>
     peers.push(peerA, peerB, peerC, peerD);
 
     const harness = new TopicReplicationHarness();
-    const topic1 = deriveDiscoveryTopic(
-      { lat: 40.7128, lon: -74.006 },
-      8,
-      "mesh-test"
-    ).topicBuffer.toString("hex");
-    const topic2 = deriveDiscoveryTopic(
-      { lat: 40.73061, lon: -73.935242 },
-      8,
-      "mesh-test"
-    ).topicBuffer.toString("hex");
+    const topicAB = topicFromScenarioCar(scenario, "car-a-origin", 0);
+    const topicBC = topicFromScenarioCar(scenario, "car-c-bridge", 0);
+    const topicCD = topicFromScenarioCar(scenario, "car-d-destination", 0);
+
+    await t.test("create sparse 4-hop topology", async (st) => {
+      harness.join(peerA, topicAB);
+      harness.join(peerB, topicAB);
+      harness.join(peerB, topicBC);
+      harness.join(peerC, topicBC);
+      harness.join(peerC, topicCD);
+      harness.join(peerD, topicCD);
+
+      await appendAddWriterMessage(peerA.base, peerB.base.local.key);
+      await appendAddWriterMessage(peerA.base, peerC.base.local.key);
+      await appendAddWriterMessage(peerA.base, peerD.base.local.key);
+      await propagateAcrossChain(peers);
+      st.pass("chain topology established and writer keys propagated");
+    });
+
+    await t.test("propagate origin event hop by hop", async (st) => {
+      await appendTelemetryEvent(
+        peerA.base,
+        createSignedEvent({
+          timestamp: 1715005000000,
+          edge_id: 8301,
+          speed_kph: 18,
+          confidence: 230,
+          flags: 2
+        })
+      );
+
+      await propagateAcrossChain(peers);
+      await propagateAcrossChain(peers);
+
+      const dEvents = await collectViewEvents(peerD.base);
+      st.ok(
+        dEvents.some((event) => event.edge_id === 8301),
+        "peer D receives event from peer A through multi-hop ferrying"
+      );
+    });
+  } finally {
+    await closePeers(peers);
+  }
+});
+
+test("Boundary handoff: peer rotates topics and continues writing", async (t) => {
+  const peers = [];
+  try {
+    const scenario = await loadScenario("boundary-handoff.json");
+    const peerA = await createPeer("A");
+    const peerB = await createPeer("B", peerA.base.key);
+    const peerC = await createPeer("C", peerA.base.key);
+    const peerD = await createPeer("D", peerA.base.key);
+    peers.push(peerA, peerB, peerC, peerD);
+
+    const harness = new TopicReplicationHarness();
+    const topic1 = topicFromScenarioCar(scenario, "car-a-handoff", 0);
+    const topic2 = topicFromScenarioCar(scenario, "car-a-handoff", 1);
 
     await t.test("join initial topics and seed topic 1 data", async (st) => {
       harness.join(peerA, topic1);
@@ -282,22 +501,15 @@ test("Boundary handoff: peer rotates topics and continues writing", async (t) =>
 test("Store-carry-forward: ferry relays event across partition", async (t) => {
   const peers = [];
   try {
+    const scenario = await loadScenario("message-ferry-chain.json");
     const peerA = await createPeer("A");
     const peerB = await createPeer("B", peerA.base.key);
     const peerC = await createPeer("C", peerA.base.key);
     peers.push(peerA, peerB, peerC);
 
     const harness = new TopicReplicationHarness();
-    const topic1 = deriveDiscoveryTopic(
-      { lat: 40.7128, lon: -74.006 },
-      8,
-      "mesh-test"
-    ).topicBuffer.toString("hex");
-    const topic2 = deriveDiscoveryTopic(
-      { lat: 34.0522, lon: -118.2437 },
-      8,
-      "mesh-test"
-    ).topicBuffer.toString("hex");
+    const topic1 = topicFromScenarioCar(scenario, "car-a-origin", 0);
+    const topic2 = topicFromScenarioCar(scenario, "car-d-destination", 0);
 
     await t.test("join partitioned topics and prepare writers", async (st) => {
       harness.join(peerA, topic1);
