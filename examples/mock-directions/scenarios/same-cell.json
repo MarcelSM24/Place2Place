@@ -1,0 +1,32 @@
+{
+  "name": "same-cell",
+  "description": "Two cars start nearby and should quickly discover each other.",
+  "tickMs": 1000,
+  "h3Resolution": 8,
+  "durationMs": 20000,
+  "interpolationStepsPerSegment": 8,
+  "cars": [
+    {
+      "id": "car-a",
+      "storageDir": "./backend/.data/examples/car-a",
+      "telemetryCoreName": "telemetry-car-a",
+      "routeWaypoints": [
+        { "lat": 40.7128, "lon": -74.006 },
+        { "lat": 40.7138, "lon": -74.0052 },
+        { "lat": 40.7142, "lon": -74.0043 },
+        { "lat": 40.713, "lon": -74.0055 }
+      ]
+    },
+    {
+      "id": "car-b",
+      "storageDir": "./backend/.data/examples/car-b",
+      "telemetryCoreName": "telemetry-car-b",
+      "routeWaypoints": [
+        { "lat": 40.7129, "lon": -74.0059 },
+        { "lat": 40.714, "lon": -74.0049 },
+        { "lat": 40.7144, "lon": -74.004 },
+        { "lat": 40.7132, "lon": -74.0054 }
+      ]
+    }
+  ]
+}
