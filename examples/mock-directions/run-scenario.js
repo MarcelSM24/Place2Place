@@ -29,7 +29,8 @@ async function startCar(carConfig, scenarioConfig) {
   });
   const mesh = new SwarmMesh({
     h3Resolution: scenarioConfig.h3Resolution,
-    nodeLabel: carConfig.id
+    nodeLabel: carConfig.id,
+    topicNamespace: scenarioConfig.topicNamespace ?? scenarioConfig.name
   });
   const nextPathPoint = createPathGenerator({
     routeWaypoints: carConfig.routeWaypoints,
@@ -71,6 +72,7 @@ async function startCar(carConfig, scenarioConfig) {
 async function run() {
   const scenario = await loadScenario();
   console.log(`[scenario] ${scenario.name}: ${scenario.description}`);
+  console.log(`[scenario] topicNamespace=${scenario.topicNamespace ?? scenario.name}`);
 
   const cars = await Promise.all(
     scenario.cars.map((carConfig) => startCar(carConfig, scenario))

@@ -1,5 +1,6 @@
 {
   "name": "different-zones",
+  "topicNamespace": "place2place-example-different-zones-v1",
   "description": "Two cars are far apart and should usually not discover each other.",
   "tickMs": 1000,
   "h3Resolution": 8,

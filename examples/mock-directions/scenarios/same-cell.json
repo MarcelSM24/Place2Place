@@ -1,5 +1,6 @@
 {
   "name": "same-cell",
+  "topicNamespace": "place2place-example-same-cell-v1",
   "description": "Two cars start nearby and should quickly discover each other.",
   "tickMs": 1000,
   "h3Resolution": 8,
