@@ -1,10 +1,15 @@
 import c from "compact-encoding";
 import b4a from "b4a";
 import Autobase from "autobase";
-import { decodeTelemetry, encodeTelemetry } from "./telemetry-encoder.js";
+import {
+  decodeTelemetry,
+  encodeTelemetry,
+  verifyWitnessSignature
+} from "./telemetry-encoder.js";
 
 const MESSAGE_TYPE_TELEMETRY = 1;
 const MESSAGE_TYPE_ADD_WRITER = 2;
+const DEFAULT_MIN_VALID_WITNESSES = 2;
 
 const autobaseMessageEncoding = {
   preencode(state, message) {
@@ -59,12 +64,43 @@ export async function applyTrafficUpdates(nodes, view, host) {
 
     if (message.type === MESSAGE_TYPE_TELEMETRY) {
       const event = decodeTelemetry(message.payload);
+      const minValidWitnesses =
+        host?.security?.minValidWitnesses ?? DEFAULT_MIN_VALID_WITNESSES;
+      const validWitnesses = countValidWitnessSignatures(event);
+
+      if (validWitnesses < minValidWitnesses) {
+        continue;
+      }
+
       await view.append(encodeTelemetry(event));
       continue;
     }
 
     throw new Error(`Unsupported traffic message type: ${message.type}`);
   }
+}
+
+function countValidWitnessSignatures(event) {
+  const signatures = Array.isArray(event?.neighbor_signatures)
+    ? event.neighbor_signatures
+    : [];
+  const seenWitnesses = new Set();
+  let validCount = 0;
+
+  for (const witness of signatures) {
+    try {
+      const witnessKeyHex = b4a.toString(witness.witness_public_key, "hex");
+      if (seenWitnesses.has(witnessKeyHex)) continue;
+      if (!verifyWitnessSignature(event, witness)) continue;
+
+      seenWitnesses.add(witnessKeyHex);
+      validCount += 1;
+    } catch {
+      // Ignore malformed witness records and count only valid cryptographic attestations.
+    }
+  }
+
+  return validCount;
 }
 
 export function createTrafficBase(store, bootstrap = null) {
@@ -76,7 +112,7 @@ export function createTrafficBase(store, bootstrap = null) {
 }
 
 export async function appendTelemetryEvent(base, event) {
-  const payload = encodeTelemetry(event);
+  const payload = encodeTelemetry(event, event?.encodingOptions);
   await base.append({
     type: MESSAGE_TYPE_TELEMETRY,
     payload

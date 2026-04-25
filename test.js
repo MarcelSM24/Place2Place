@@ -1,6 +1,7 @@
 import os from "node:os";
 import path from "node:path";
 import fs from "node:fs/promises";
+import { generateKeyPairSync } from "node:crypto";
 import test from "brittle";
 import Corestore from "corestore";
 import {
@@ -10,7 +11,8 @@ import {
   getLatestSpeedForEdge
 } from "./traffic-base.js";
 import {
-  TELEMETRY_PAYLOAD_SIZE,
+  BASE_TELEMETRY_PAYLOAD_SIZE,
+  createWitnessSignature,
   decodeTelemetry,
   encodeTelemetry
 } from "./telemetry-encoder.js";
@@ -35,20 +37,53 @@ async function waitFor(conditionFn, timeoutMs = 10000) {
   throw new Error("Timed out waiting for condition");
 }
 
-test("telemetry encoding is fixed 19 bytes and decodes correctly", async (t) => {
+function createSignedEvent(event) {
+  const witnessA = generateKeyPairSync("ed25519").privateKey.export({
+    format: "der",
+    type: "pkcs8"
+  });
+  const witnessB = generateKeyPairSync("ed25519").privateKey.export({
+    format: "der",
+    type: "pkcs8"
+  });
+  const signable = { ...event, neighbor_signatures: [] };
+  return {
+    ...signable,
+    neighbor_signatures: [
+      createWitnessSignature(signable, witnessA),
+      createWitnessSignature(signable, witnessB)
+    ]
+  };
+}
+
+test("telemetry encoding includes witness signatures and decodes correctly", async (t) => {
   const input = {
     timestamp: 1712345678901,
     edge_id: 42,
     speed_kph: 73,
     confidence: 215,
-    flags: 3
+    flags: 3,
+    neighbor_signatures: []
   };
+  input.neighbor_signatures = createSignedEvent(input).neighbor_signatures;
 
   const encoded = encodeTelemetry(input);
-  t.is(encoded.byteLength, TELEMETRY_PAYLOAD_SIZE, "payload is exactly 19 bytes");
+  t.ok(
+    encoded.byteLength >= BASE_TELEMETRY_PAYLOAD_SIZE,
+    "payload includes base telemetry bytes plus witness attestations"
+  );
 
   const decoded = decodeTelemetry(encoded);
-  t.alike(decoded, input, "decoded payload matches original values");
+  t.is(decoded.timestamp, input.timestamp, "timestamp decodes");
+  t.is(decoded.edge_id, input.edge_id, "edge id decodes");
+  t.is(decoded.speed_kph, input.speed_kph, "speed decodes");
+  t.is(decoded.confidence, input.confidence, "confidence decodes");
+  t.is(decoded.flags, input.flags, "flags decodes");
+  t.is(
+    decoded.neighbor_signatures.length,
+    input.neighbor_signatures.length,
+    "witness signature count decodes"
+  );
 });
 
 test("autobase linearizes local and remote writers to latest speed", async (t) => {
@@ -75,21 +110,21 @@ test("autobase linearizes local and remote writers to latest speed", async (t) =
   });
 
   const edgeId = 777;
-  await appendTelemetryEvent(localBase, {
+  await appendTelemetryEvent(localBase, createSignedEvent({
     timestamp: 1710000000000,
     edge_id: edgeId,
     speed_kph: 25,
     confidence: 200,
     flags: 0
-  });
+  }));
 
-  await appendTelemetryEvent(remoteBase, {
+  await appendTelemetryEvent(remoteBase, createSignedEvent({
     timestamp: 1710000001000,
     edge_id: edgeId,
     speed_kph: 61,
     confidence: 220,
     flags: 1
-  });
+  }));
 
   await localBase.update();
   await remoteBase.update();
