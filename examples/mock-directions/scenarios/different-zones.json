@@ -1,0 +1,32 @@
+{
+  "name": "different-zones",
+  "description": "Two cars are far apart and should usually not discover each other.",
+  "tickMs": 1000,
+  "h3Resolution": 8,
+  "durationMs": 20000,
+  "interpolationStepsPerSegment": 8,
+  "cars": [
+    {
+      "id": "car-nyc",
+      "storageDir": "./backend/.data/examples/car-nyc",
+      "telemetryCoreName": "telemetry-car-nyc",
+      "routeWaypoints": [
+        { "lat": 40.7128, "lon": -74.006 },
+        { "lat": 40.7138, "lon": -74.0052 },
+        { "lat": 40.7142, "lon": -74.0043 },
+        { "lat": 40.713, "lon": -74.0055 }
+      ]
+    },
+    {
+      "id": "car-london",
+      "storageDir": "./backend/.data/examples/car-london",
+      "telemetryCoreName": "telemetry-car-london",
+      "routeWaypoints": [
+        { "lat": 51.5072, "lon": -0.1276 },
+        { "lat": 51.5079, "lon": -0.1264 },
+        { "lat": 51.5085, "lon": -0.1253 },
+        { "lat": 51.5077, "lon": -0.127 }
+      ]
+    }
+  ]
+}
