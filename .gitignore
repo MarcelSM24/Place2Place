@@ -14,3 +14,13 @@ backend/native/valhalla-data/
 backend/native/valhalla-install/
 backend/native/valhalla-src/
 backend/native/valhalla-addon/node_modules/
+
+# local runtime data
+backend/.data/
+
+# common large generated artifacts
+*.tar
+*.pbf
+*.sqlite
+*.sst
+*.blob
