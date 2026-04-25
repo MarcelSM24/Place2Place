@@ -1,0 +1,8 @@
+[
+{
+  "directory": "/Users/marcelsm/Place2Place/backend/native/valhalla-addon/build",
+  "command": "/usr/bin/c++ --target=arm64-apple-macosx12.0 -DBARE_MODULE_NAME=\\\"valhalla-native-addon@0.1.0\\\" -I/Users/marcelsm/Place2Place/backend/native/valhalla-addon/build/_bare/node_modules/bare-headers/include -I/opt/homebrew/include -isystem /Users/marcelsm/Place2Place/backend/native/valhalla-install/include -isystem /Users/marcelsm/Place2Place/backend/native/valhalla-install/include/valhalla/third_party -isystem /opt/homebrew/Cellar/protobuf/34.1/include -isystem /opt/homebrew/Cellar/abseil/20260107.1/include -isystem /opt/homebrew/Cellar/libspatialite/5.1.0_4/include -isystem /opt/homebrew/Cellar/luajit/2.1.1774896198/include/luajit-2.1 -isystem /opt/homebrew/Cellar/geos/3.14.1/include -isystem /opt/homebrew/Cellar/openssl@3/3.6.2/include -isystem /opt/homebrew/opt/lz4/include -O3 -DNDEBUG -std=c++20 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk -mmacosx-version-min=12.0 -fPIC -DPROTOBUF_USE_DLLS -Wno-float-conversion -Wno-implicit-float-conversion -Wno-implicit-int-float-conversion -Wno-unknown-warning-option -Wno-unused-command-line-argument -DNOMINMAX -o CMakeFiles/valhalla-native-addon-0.1.0-680cb9bc.dir/binding.cc.o -c /Users/marcelsm/Place2Place/backend/native/valhalla-addon/binding.cc",
+  "file": "/Users/marcelsm/Place2Place/backend/native/valhalla-addon/binding.cc",
+  "output": "/Users/marcelsm/Place2Place/backend/native/valhalla-addon/build/CMakeFiles/valhalla-native-addon-0.1.0-680cb9bc.dir/binding.cc.o"
+}
+]

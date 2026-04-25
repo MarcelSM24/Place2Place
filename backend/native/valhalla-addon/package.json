@@ -1,0 +1,12 @@
+{
+  "name": "valhalla-native-addon",
+  "version": "0.1.0",
+  "private": true,
+  "main": "binding.js",
+  "type": "commonjs",
+  "dependencies": {
+    "bare": "^1.28.4",
+    "bare-make": "^1.7.2",
+    "cmake-bare": "^1.7.7"
+  }
+}

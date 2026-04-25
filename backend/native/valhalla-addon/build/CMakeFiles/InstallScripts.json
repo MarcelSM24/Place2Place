@@ -1,0 +1,7 @@
+{
+	"InstallScripts" : 
+	[
+		"/Users/marcelsm/Place2Place/backend/native/valhalla-addon/build/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

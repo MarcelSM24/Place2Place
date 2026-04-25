@@ -1,0 +1,1 @@
+/Users/marcelsm/Place2Place/backend/native/valhalla-addon/prebuilds/darwin-arm64/valhalla-native-addon.bare

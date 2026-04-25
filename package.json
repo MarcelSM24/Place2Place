@@ -24,6 +24,9 @@
     "hyperswarm": "latest"
   },
   "devDependencies": {
-    "autobase-test-helpers": "^3.1.0"
+    "autobase-test-helpers": "^3.1.0",
+    "bare": "^1.28.4",
+    "bare-make": "^1.7.2",
+    "cmake-bare": "^1.7.7"
   }
 }
