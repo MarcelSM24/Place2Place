@@ -3,9 +3,10 @@ import b4a from "b4a";
 import { deriveDiscoveryTopic } from "./topic.js";
 
 export class SwarmMesh {
-  constructor({ h3Resolution, nodeLabel = "node" }) {
+  constructor({ h3Resolution, nodeLabel = "node", topicNamespace = "" }) {
     this.h3Resolution = h3Resolution;
     this.nodeLabel = nodeLabel;
+    this.topicNamespace = topicNamespace;
     this.swarm = new Hyperswarm();
     this.currentCell = null;
     this.currentTopic = null;
@@ -17,6 +18,13 @@ export class SwarmMesh {
       this.connections.add(socket);
       console.log(`[mesh:${this.nodeLabel}] connected peer=${peerKey}`);
 
+      socket.on("error", (error) => {
+        // Connections can reset during topic rotation/shutdown; treat as normal noise.
+        console.warn(
+          `[mesh:${this.nodeLabel}] peer socket error peer=${peerKey} code=${error?.code ?? "unknown"}`
+        );
+      });
+
       socket.on("close", () => {
         this.connections.delete(socket);
         console.log(`[mesh:${this.nodeLabel}] disconnected peer=${peerKey}`);
@@ -25,7 +33,11 @@ export class SwarmMesh {
   }
 
   async updatePosition(position) {
-    const next = deriveDiscoveryTopic(position, this.h3Resolution);
+    const next = deriveDiscoveryTopic(
+      position,
+      this.h3Resolution,
+      this.topicNamespace
+    );
 
     if (next.h3Cell === this.currentCell) {
       return {

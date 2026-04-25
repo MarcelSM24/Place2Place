@@ -16,3 +16,11 @@ These scenarios help validate whether peer discovery behaves correctly with mock
 - You should see `[mesh:<car-id>] connected peer=...` logs in the near scenario.
 - You should see very few or no connection logs in the far scenario.
 - Each car logs its current H3 cell and whether discovery topic rotated.
+
+## Isolation behavior
+
+Scenarios include a `topicNamespace` value. Topic derivation uses:
+
+- `sha256("${topicNamespace}:${h3Cell}")`
+
+This isolates example traffic from any other local/background peers not using the same namespace.
