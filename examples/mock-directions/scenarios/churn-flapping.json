@@ -1,0 +1,44 @@
+{
+  "name": "churn-flapping",
+  "topicNamespace": "place2place-example-churn-flapping-v1",
+  "description": "Multiple cars move around the same metro area with frequent topic changes near H3 boundaries.",
+  "tickMs": 700,
+  "h3Resolution": 8,
+  "durationMs": 25000,
+  "interpolationStepsPerSegment": 4,
+  "cars": [
+    {
+      "id": "car-a-flap",
+      "storageDir": "./backend/.data/examples/car-a-flap",
+      "telemetryCoreName": "telemetry-car-a-flap",
+      "routeWaypoints": [
+        { "lat": 40.7128, "lon": -74.006 },
+        { "lat": 40.7212, "lon": -73.9985 },
+        { "lat": 40.7293, "lon": -73.9908 },
+        { "lat": 40.7209, "lon": -73.9989 }
+      ]
+    },
+    {
+      "id": "car-b-flap",
+      "storageDir": "./backend/.data/examples/car-b-flap",
+      "telemetryCoreName": "telemetry-car-b-flap",
+      "routeWaypoints": [
+        { "lat": 40.713, "lon": -74.0058 },
+        { "lat": 40.722, "lon": -73.9976 },
+        { "lat": 40.7301, "lon": -73.9897 },
+        { "lat": 40.7217, "lon": -73.9981 }
+      ]
+    },
+    {
+      "id": "car-c-flap",
+      "storageDir": "./backend/.data/examples/car-c-flap",
+      "telemetryCoreName": "telemetry-car-c-flap",
+      "routeWaypoints": [
+        { "lat": 40.7127, "lon": -74.0061 },
+        { "lat": 40.7208, "lon": -73.9992 },
+        { "lat": 40.7286, "lon": -73.9914 },
+        { "lat": 40.7205, "lon": -73.9995 }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "name": "message-ferry-chain",
+  "topicNamespace": "place2place-example-message-ferry-chain-v1",
+  "description": "A sparse chain where one car ferries observations between distant topic regions.",
+  "tickMs": 1000,
+  "h3Resolution": 8,
+  "durationMs": 30000,
+  "interpolationStepsPerSegment": 8,
+  "cars": [
+    {
+      "id": "car-a-origin",
+      "storageDir": "./backend/.data/examples/car-a-origin",
+      "telemetryCoreName": "telemetry-car-a-origin",
+      "routeWaypoints": [
+        { "lat": 40.7128, "lon": -74.006 },
+        { "lat": 40.7135, "lon": -74.0052 },
+        { "lat": 40.714, "lon": -74.0044 },
+        { "lat": 40.7132, "lon": -74.0055 }
+      ]
+    },
+    {
+      "id": "car-b-ferry",
+      "storageDir": "./backend/.data/examples/car-b-ferry",
+      "telemetryCoreName": "telemetry-car-b-ferry",
+      "routeWaypoints": [
+        { "lat": 40.713, "lon": -74.0057 },
+        { "lat": 41.8781, "lon": -87.6298 },
+        { "lat": 34.0522, "lon": -118.2437 },
+        { "lat": 41.8782, "lon": -87.6294 }
+      ]
+    },
+    {
+      "id": "car-c-bridge",
+      "storageDir": "./backend/.data/examples/car-c-bridge",
+      "telemetryCoreName": "telemetry-car-c-bridge",
+      "routeWaypoints": [
+        { "lat": 41.878, "lon": -87.6301 },
+        { "lat": 41.8784, "lon": -87.6295 },
+        { "lat": 41.8788, "lon": -87.6289 },
+        { "lat": 41.8782, "lon": -87.6297 }
+      ]
+    },
+    {
+      "id": "car-d-destination",
+      "storageDir": "./backend/.data/examples/car-d-destination",
+      "telemetryCoreName": "telemetry-car-d-destination",
+      "routeWaypoints": [
+        { "lat": 34.0521, "lon": -118.2439 },
+        { "lat": 34.0526, "lon": -118.2431 },
+        { "lat": 34.053, "lon": -118.2424 },
+        { "lat": 34.0523, "lon": -118.2435 }
+      ]
+    }
+  ]
+}
