@@ -1,75 +1,58 @@
-# 🚗 Place2Place: Descentralizando la Navegación GPS Urbana
+# 🚗 PlaceToPlace
 
-**Place2Place** es una aplicación de navegación GPS y simulación de tráfico **100% Peer-to-Peer (P2P)**. Elimina la necesidad de servidores centralizados gigantescos (como los de Google Maps o Waze) trasladando toda la inteligencia algorítmica directamente a los vehículos (*Edge Computing*).
+**PlaceToPlace** is a decentralized traffic and routing simulation where each car acts as a peer.  
+Instead of relying on centralized traffic infrastructure, vehicles share local telemetry in a geographic P2P mesh and continuously adapt route decisions based on nearby network state.
 
-Construido para el **HackUPC**, Place2Place demuestra que el futuro de las Smart Cities puede ser colaborativo, resistente a censuras, 100% privado y operado íntegramente por los propios ciudadanos.
+## Inspiration
 
----
+Urban traffic systems are usually coordinated through centralized services that can become expensive, fragile, or unavailable in constrained environments. We wanted to explore a different model: what if cars could coordinate traffic conditions directly with nearby peers, in real time, without requiring a global backend.
 
-## 🛑 El Problema Actual
+PlaceToPlace is inspired by decentralized communication systems, local-first design, and the idea that traffic intelligence can emerge from neighborhood-level collaboration rather than top-down control.
 
-Los sistemas de navegación y tráfico dominantes sufren de problemas fundamentales:
-1. **Centralización Extrema:** Dependen de inmensas granjas de servidores que requieren una potencia de cálculo brutal para procesar los datos de millones de coches. Un fallo en sus servidores colapsa el sistema global.
-2. **Invasión a la Privacidad:** Actúan como un "Gran Hermano". Los proveedores saben exactamente dónde estás, a dónde vas y qué rutas sueles tomar a diario, centralizando perfiles de movilidad extremadamente sensibles.
-3. **Mantenimiento Costoso:** Procesar algoritmos de enrutamiento (Dijkstra/A*) para miles de peticiones por segundo en un backend central es financieramente insostenible sin monetizar los datos del usuario.
+## What it does
 
-## 🌟 Nuestra Solución
+- Simulates moving cars over a city-like graph.
+- Discovers nearby peers using geographic partitioning (H3 cells) and Hyperswarm topics.
+- Shares and replicates telemetry events (position, speed, timestamp) through per-peer append-only logs.
+- Merges multi-writer traffic updates into a consistent local view using Autobase.
+- Streams aggregated state to the web map through a local WebSocket bridge.
+- Supports dynamic congestion behavior and route adaptation in the interface.
 
-**Place2Place** invierte el paradigma. La nube desaparece. En nuestro sistema:
-- **No hay backend que calcule rutas:** Tu propio navegador web / app descarga el grafo estático de las calles y usa su CPU local para calcular la mejor ruta.
-- **No hay backend de tráfico:** La congestión de tráfico se detecta de forma orgánica "chismorreando" (*Gossip Protocol*) con los coches que tienes alrededor.
-- **Identidad Efímera:** Tus datos nunca viajan asociados a un ID persistente, preservando tu anonimato absoluto.
+## How we built it
 
----
+- **Spatial discovery:** `h3-js` converts GPS-like coordinates into hex cells so peers discover only relevant neighbors.
+- **P2P networking:** `hyperswarm` handles peer discovery and secure connectivity over DHT topics derived from geographic cells.
+- **Data model:** each peer writes movement events to its own `hypercore`; `corestore` manages local + remote cores.
+- **State convergence:** `autobase` linearizes multiple writers into an eventually consistent traffic timeline.
+- **Frontend bridge:** a local `ws` server pushes live aggregated traffic events to the browser map.
+- **Routing simulation:** local route logic applies congestion penalties and rerouting behavior for observable network effects.
 
-## ⚙️ Tecnologías Clave y Arquitectura
+## Challenges we ran into
 
-### 1. 🕸️ Red Epidémica y WebRTC (Gossip Protocol)
-Utilizamos **PeerJS (WebRTC)** para establecer canales de datos P2P directos entre los navegadores. Los eventos de tráfico (frenazos, averías, densidad) se transmiten entre los nodos conectados mediante un protocolo Epidémico: tu coche le susurra a los coches más cercanos, y estos a los suyos, propagando la información de la ciudad a la velocidad de la luz sin saturar un servidor central.
+- Avoiding global broadcast behavior while preserving enough local connectivity for useful routing updates.
+- Coordinating topic transitions when peers move between H3 regions.
+- Designing state flow so multi-writer updates remain understandable and debuggable in real time.
+- Balancing simulation realism with responsiveness and reproducibility during local development.
+- Keeping the frontend experience smooth while backend peer topology changes frequently.
 
-### 2. 🧠 Inteligencia de Enjambre (Swarm AI)
-Cada vehículo es un agente autónomo y egoísta. En lugar de recibir instrucciones desde arriba:
-- El navegador rastrea la telemetría de sus pares cercanos.
-- Si detecta que en una calle los vehículos vecinos circulan a **menos de 40 km/h**, aumenta dinámicamente el "coste temporal" de ese tramo en su propio mapa mental.
-- Tras alterar su grafo local, lanza una búsqueda heurística **A* (A-Star)**. Si descubre que desviarse es un 15% más rápido, el sistema realiza una redirección preventiva (marcada visualmente en **magenta**).
+## Accomplishments that we're proud of
 
-### 3. 🔐 Privacidad Extrema y "Proof of Location"
-*(Basado en nuestra integración modular de Holepunch/Pear)*
-Utilizamos claves asimétricas **ed25519** efímeras que **rotan automáticamente cada 10 minutos** o cuando el vehículo cruza ciertos hexágonos geográficos (H3). Los coches atestiguan criptográficamente que hay un atasco para evitar spam (*Sybil resistance*), pero debido a la rotación constante, es imposible trazar el origen y el destino de un conductor a lo largo de un trayecto completo.
+- Built an end-to-end decentralized runtime where simulated vehicles discover, connect, and sync traffic telemetry.
+- Replaced centralized state sharing with geographically scoped P2P collaboration.
+- Connected backend distributed state to a real-time frontend visualization via WebSockets.
+- Created a solid foundation for future routing intelligence integrations.
 
-### 4. 🌍 Mapeo Hexagonal (Uber H3)
-Para resolver la complejidad de encontrar pares cercanos en un globo terráqueo masivo, usamos el sistema de indexación espacial **H3**. Los canales de descubrimiento y los pesos dinámicos se clusterizan usando la resolución de red hexagonal, permitiendo búsquedas de proximidad $O(1)$ sin comprometer la latitud/longitud exacta.
+## What we learned
 
----
+- Geographic partitioning is essential for scalable peer discovery in mobility-focused systems.
+- Single-writer logs plus deterministic merge layers are a practical pattern for decentralized telemetry.
+- Real-time visual feedback dramatically improves debugging of distributed behavior.
+- Local-first architecture design forces clearer boundaries between transport, storage, and UI concerns.
 
-## 🛠️ Cómo Probar la Simulación (Demo)
+## What's next for PlaceToPlace
 
-Hemos preparado una demostración visual interactiva donde los vehículos operan autónomamente y reaccionan al tráfico orgánicamente.
-
-1. Instala las dependencias:
-   ```bash
-   npm install
-   ```
-2. Arranca el servidor local de estáticos:
-   ```bash
-   node dijkstra/server.js
-   ```
-3. Abre al menos **3 o 4 pestañas** en tu navegador en `http://localhost:3000`.
-   - *Verás cómo cada pestaña instancia un coche diferente y se conectan en malla P2P.*
-4. **Interactúa:**
-   - Observa cómo si la densidad de coches azules aumenta en una calle y su velocidad cae, tu coche rojo automáticamente recalculará una **ruta alternativa en magenta**.
-   - Haz clic en **⚠ Generar Coche Lento** para simular un "dominguero" a 20 km/h y observa cómo toda la red P2P entra en pánico, propaga el mensaje de "Atasco Fuerte", y todos los vehículos empiezan a callejear para evitar la zona colapsada de forma sincronizada, sin necesidad de un servidor central.
-
----
-
-## 🔮 Conclusión
-Place2Place demuestra que la inteligencia de una Smart City no necesita estar centralizada en manos privadas. Un sistema P2P guiado por **Inteligencia de Enjambre** resulta en un tráfico más optimizado, coste de infraestructura nulo y privacidad garantizada por defecto.
-
-*Make routing sovereign again.*
-
----
-
-## 📚 Documentación adicional
-
-- Escenarios mock de descubrimiento P2P: `examples/mock-directions/README.md`
-- Checklist de documentación por archivo: `docs/FILE_DOCUMENTATION.md`
+- Integrate route engines (for example, Valhalla) to compute optimal paths from decentralized live traffic state.
+- Improve peer handoff and continuity when vehicles cross H3 boundaries.
+- Add richer telemetry signals (incidents, lane slowdowns, confidence scores).
+- Expand simulation scenarios and stress-test under larger peer populations.
+- Continue hardening the Pear/Holepunch-aligned backend runtime for production-like environments.
