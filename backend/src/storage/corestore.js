@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import Corestore from "corestore";
-import b4a from "b4a";
+import { decodeTelemetry19, encodeTelemetry19 } from "../telemetry-encoder.js";
 
 export async function initStorage(storageConfig) {
   const dataDirectory = path.resolve(storageConfig.baseDirectory);
@@ -17,8 +17,12 @@ export async function initStorage(storageConfig) {
     corestore,
     telemetryCore,
     async appendTelemetry(eventPayload) {
-      const encodedPayload = b4a.from(JSON.stringify(eventPayload));
+      const encodedPayload = encodeTelemetry19(eventPayload);
       await telemetryCore.append(encodedPayload);
+    },
+    async getTelemetryAt(index) {
+      const buffer = await telemetryCore.get(index);
+      return decodeTelemetry19(buffer);
     },
     async close() {
       await telemetryCore.close();

@@ -6,8 +6,14 @@ import {
   sign as cryptoSign,
   verify as cryptoVerify
 } from "node:crypto";
+import {
+  decodeTelemetry19,
+  encodeTelemetry19,
+  TELEMETRY_PAYLOAD_BYTES,
+  validateTelemetry19
+} from "./backend/src/telemetry-encoder.js";
 
-export const BASE_TELEMETRY_PAYLOAD_SIZE = 19;
+export const BASE_TELEMETRY_PAYLOAD_SIZE = TELEMETRY_PAYLOAD_BYTES;
 
 const witnessSignatureEncoding = {
   preencode(state, witness) {
@@ -28,28 +34,24 @@ const witnessSignatureEncoding = {
 
 export const telemetryEncoding = {
   preencode(state, event) {
-    c.uint64.preencode(state);
-    c.uint64.preencode(state);
-    c.uint8.preencode(state);
-    c.uint8.preencode(state);
-    c.uint8.preencode(state);
+    const payload = encodeTelemetry19(event);
+    c.uint8array.preencode(state, payload);
     c.array(witnessSignatureEncoding).preencode(state, event.neighbor_signatures);
   },
   encode(state, event) {
-    c.uint64.encode(state, event.timestamp);
-    c.uint64.encode(state, event.edge_id);
-    c.uint8.encode(state, event.speed_kph);
-    c.uint8.encode(state, event.confidence);
-    c.uint8.encode(state, event.flags);
+    const payload = encodeTelemetry19(event);
+    c.uint8array.encode(state, payload);
     c.array(witnessSignatureEncoding).encode(state, event.neighbor_signatures);
   },
   decode(state) {
+    const payload = c.uint8array.decode(state);
+    const decoded = decodeTelemetry19(payload);
     return {
-      timestamp: c.uint64.decode(state),
-      edge_id: c.uint64.decode(state),
-      speed_kph: c.uint8.decode(state),
-      confidence: c.uint8.decode(state),
-      flags: c.uint8.decode(state),
+      timestamp: decoded.timestamp,
+      edge_id: decoded.edge_id,
+      speed_kph: decoded.speed_kph,
+      confidence: decoded.confidence,
+      flags: decoded.flags,
       neighbor_signatures: c.array(witnessSignatureEncoding).decode(state)
     };
   }
@@ -57,27 +59,15 @@ export const telemetryEncoding = {
 
 const telemetrySigningEncoding = {
   preencode(state, event) {
-    c.uint64.preencode(state, event.timestamp);
-    c.uint64.preencode(state, event.edge_id);
-    c.uint8.preencode(state, event.speed_kph);
-    c.uint8.preencode(state, event.confidence);
-    c.uint8.preencode(state, event.flags);
+    const payload = encodeTelemetry19(event);
+    c.uint8array.preencode(state, payload);
   },
   encode(state, event) {
-    c.uint64.encode(state, event.timestamp);
-    c.uint64.encode(state, event.edge_id);
-    c.uint8.encode(state, event.speed_kph);
-    c.uint8.encode(state, event.confidence);
-    c.uint8.encode(state, event.flags);
+    const payload = encodeTelemetry19(event);
+    c.uint8array.encode(state, payload);
   },
   decode(state) {
-    return {
-      timestamp: c.uint64.decode(state),
-      edge_id: c.uint64.decode(state),
-      speed_kph: c.uint8.decode(state),
-      confidence: c.uint8.decode(state),
-      flags: c.uint8.decode(state)
-    };
+    return decodeTelemetry19(c.uint8array.decode(state));
   }
 };
 
@@ -113,21 +103,7 @@ function validateTelemetryEvent(event, { requireSignatures = true } = {}) {
     neighbor_signatures = []
   } = event;
 
-  if (!Number.isSafeInteger(timestamp) || timestamp < 0) {
-    throw new Error("timestamp must be a non-negative safe integer");
-  }
-  if (!Number.isSafeInteger(edge_id) || edge_id < 0) {
-    throw new Error("edge_id must be a non-negative safe integer");
-  }
-  if (!Number.isInteger(speed_kph) || speed_kph < 0 || speed_kph > 255) {
-    throw new Error("speed_kph must be an integer in [0, 255]");
-  }
-  if (!Number.isInteger(confidence) || confidence < 0 || confidence > 255) {
-    throw new Error("confidence must be an integer in [0, 255]");
-  }
-  if (!Number.isInteger(flags) || flags < 0 || flags > 255) {
-    throw new Error("flags must be an integer in [0, 255]");
-  }
+  validateTelemetry19({ timestamp, edge_id, speed_kph, confidence, flags });
 
   if (!Array.isArray(neighbor_signatures)) {
     throw new Error("neighbor_signatures must be an array");

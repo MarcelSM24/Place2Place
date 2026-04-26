@@ -1,0 +1,55 @@
+# OS / editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Runtime and caches
+*.pid
+*.seed
+*.pid.lock
+*.tsbuildinfo
+.cache/
+.tmp/
+tmp/
+
+# Test coverage and reports
+coverage/
+.nyc_output/
+
+# Build outputs
+dist/
+build/
+out/
+
+# Pear / backend local data
+backend/.data/
+backend/.data*/
+
+# Hypercore / Autobase runtime artifacts
+*.blob
+*.bitfield
+*.oplog
+
+# Native build outputs (Valhalla)
+backend/native/valhalla-src/build*/
+backend/native/valhalla-src/
+
+# Cursor local logs
+.cursor/*.log

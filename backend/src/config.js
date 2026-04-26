@@ -1,20 +1,20 @@
 export const SIMULATION_CONFIG = {
   tickMs: 1000,
-  h3Resolution: 8,
+  h3Resolution: 12,
   startPosition: {
-    lat: 40.7128,
-    lon: -74.006
+    lat: 41.387,
+    lon: 2.17
   },
-  // Waypoints around lower Manhattan to force occasional H3 cell changes.
+  // Waypoints around Barcelona so the dijkstra frontend view is aligned.
   routeWaypoints: [
-    { lat: 40.7128, lon: -74.006 },
-    { lat: 40.7159, lon: -74.0027 },
-    { lat: 40.719, lon: -73.9988 },
-    { lat: 40.7223, lon: -73.9952 },
-    { lat: 40.725, lon: -73.9996 },
-    { lat: 40.7215, lon: -74.0043 },
-    { lat: 40.7174, lon: -74.0081 },
-    { lat: 40.714, lon: -74.0102 }
+    { lat: 41.387, lon: 2.17 },
+    { lat: 41.3898, lon: 2.1752 },
+    { lat: 41.3932, lon: 2.1805 },
+    { lat: 41.3961, lon: 2.1841 },
+    { lat: 41.3992, lon: 2.1789 },
+    { lat: 41.3957, lon: 2.1731 },
+    { lat: 41.3918, lon: 2.1687 },
+    { lat: 41.3884, lon: 2.1654 }
   ],
   interpolationStepsPerSegment: 10
 };

@@ -1,0 +1,12 @@
+{
+  "type": "module",
+  "dependencies": {
+    "compact-encoding": "^3.0.0",
+    "h3-js": "^4.4.0",
+    "ngraph.graph": "^20.1.2",
+    "ngraph.path": "^1.6.1",
+    "express": "^4.18.2",
+    "ws": "^8.14.2"
+  }
+}
+
