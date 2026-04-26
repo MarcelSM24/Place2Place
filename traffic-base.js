@@ -96,7 +96,7 @@ function countValidWitnessSignatures(event) {
       seenWitnesses.add(witnessKeyHex);
       validCount += 1;
     } catch {
-      // Ignore malformed witness records and count only valid cryptographic attestations.
+
     }
   }
 

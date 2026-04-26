@@ -447,8 +447,6 @@ function spawnMyVehicle() {
     
     try {
         const route = calculateRoute(startHex, destHex);
-        if (route.length <= 1) throw new Error("Ruta demasiado corta");
-        
         myVehicle = new Vehicle(myNodeId, startHex, route);
         currentDestination = destHex;
         
@@ -463,8 +461,8 @@ function spawnMyVehicle() {
         
         updateStatus('Vehículo auto-iniciado con ruta aleatoria. Click en el mapa para redirigir.', 'blue');
     } catch(e) {
-        // Si cae en una "isla" desconectada del grafo o no hay ruta, reintentar en otro punto
-        setTimeout(spawnMyVehicle, 200);
+        myVehicle = new Vehicle(myNodeId, startHex, [startHex]);
+        updateStatus('Vehículo estático iniciado. Click en el mapa para navegar.', 'blue');
     }
 }
 
@@ -621,14 +619,10 @@ setInterval(() => {
                 // Generar nueva ruta aleatoria en área moderada
                 const randomLat = 41.387 + (Math.random() - 0.5) * 0.015;
                 const randomLng = 2.170 + (Math.random() - 0.5) * 0.015;
+                const destHex = snapToNearestValidHex(getHexFromLatLng(randomLat, randomLng));
+                
                 try {
-                    let destHex = snapToNearestValidHex(getHexFromLatLng(randomLat, randomLng));
-                    // Asegurarnos de que no nos manda al mismo sitio exacto
-                    if (destHex === myVehicle.currentHex) throw new Error("Mismo destino");
-                    
                     const newRoute = calculateRoute(myVehicle.currentHex, destHex);
-                    if (newRoute.length <= 1) throw new Error("Ruta demasiado corta");
-                    
                     myVehicle.route = newRoute;
                     myVehicle.position = 0;
                     myVehicle.isWaiting = false;
