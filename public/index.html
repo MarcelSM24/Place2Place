@@ -6,42 +6,69 @@
     <title>Place2Place Demo</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
-        body { margin: 0; font-family: Arial, sans-serif; }
+        body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #000; }
         #map { height: 100vh; }
         #logo {
             position: absolute;
-            top: 10px;
-            right: 10px;
+            top: 15px;
+            right: 15px;
             z-index: 1000;
-            width: min(8vw, 90px);
+            width: min(10vw, 120px);
             height: auto;
             pointer-events: none;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
         }
         #info {
-            position: absolute; bottom: 10px; left: 10px; background: rgba(255,255,255,0.95);
-            padding: 10px; z-index: 1000; max-width: 300px; border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3); font-size: 14px;
+            position: absolute; bottom: 20px; left: 20px; 
+            background: rgba(15, 15, 15, 0.95);
+            color: #eeeeee;
+            padding: 20px; z-index: 1000; 
+            width: 350px; 
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.8); 
+            font-size: 14px;
+            border: 1px solid #333;
+            backdrop-filter: blur(4px);
         }
-        #status { font-weight: bold; margin-bottom: 8px; }
+        #status { font-weight: bold; margin-bottom: 12px; font-size: 16px; color: #4ade80; }
         #debug {
-            margin-top: 10px; max-height: 150px; overflow: auto; font-size: 11px;
-            background: #f8f8f8; padding: 5px; border: 1px solid #ddd; border-radius: 4px;
+            margin-top: 10px; height: 180px; overflow-y: auto; font-size: 12px;
+            background: #000; padding: 10px; border: 1px solid #333; border-radius: 6px;
+            color: #00ff41; /* Hacker green */
+            font-family: 'Courier New', Courier, monospace;
+            word-wrap: break-word;
         }
+        #debug::-webkit-scrollbar { width: 6px; }
+        #debug::-webkit-scrollbar-thumb { background: #555; border-radius: 3px; }
+        
+        .panel-title {
+            font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px;
+            color: #888; margin-bottom: 8px; border-bottom: 1px solid #333; padding-bottom: 4px;
+            font-weight: bold;
+        }
+        .btn {
+            margin-top: 8px; width: 100%; padding: 12px; border: none; border-radius: 6px; 
+            cursor: pointer; font-weight: bold; transition: 0.2s; font-size: 13px;
+        }
+        .btn:hover { filter: brightness(1.2); }
     </style>
 </head>
 <body>
     <div id="map"></div>
     <img id="logo" src="/Logo.png" alt="Place2Place logo" />
     <div id="info">
+        <div class="panel-title">System Status</div>
         <div id="status">Conectando...</div>
-        <p>Haz clic en el mapa para destino (coche rojo).</p>
-        <p>Azules: otros coches</p>
-        <button id="btnSpawnMainVehicle" style="margin-top: 5px; width: 100%; padding: 8px; background: #1f8bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">Spawn Main Vehicle</button>
-        <button id="btnStressTest" style="margin-top: 5px; width: 100%; padding: 8px; background: #ff4444; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">¡Generar Atasco!</button>
-        <pre id="debug"></pre>
+        <p style="font-size: 12px; color: #aaa; margin: 5px 0;">Haz clic en el mapa para marcar un destino manual.</p>
+        
+        <button id="btnStressTest" class="btn" style="background: #dc2626; color: white;">⚠ Generar Coche Lento</button>
+        
+        <div class="panel-title" style="margin-top: 20px;">P2P Telemetry (Gossip)</div>
+        <div id="debug"></div>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="app.js"></script>
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    <script type="module" src="app_p2p.js"></script>
 </body>
 </html>
