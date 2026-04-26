@@ -8,6 +8,15 @@
     <style>
         body { margin: 0; font-family: Arial, sans-serif; }
         #map { height: 100vh; }
+        #logo {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 1000;
+            width: min(8vw, 90px);
+            height: auto;
+            pointer-events: none;
+        }
         #info {
             position: absolute; bottom: 10px; left: 10px; background: rgba(255,255,255,0.95);
             padding: 10px; z-index: 1000; max-width: 300px; border-radius: 8px;
@@ -22,6 +31,7 @@
 </head>
 <body>
     <div id="map"></div>
+    <img id="logo" src="/Logo.png" alt="Place2Place logo" />
     <div id="info">
         <div id="status">Conectando...</div>
         <p>Haz clic en el mapa para destino (coche rojo).</p>
