@@ -1,5 +1,7 @@
 # Place2Place - P2P Navigation Demo
 
+Resumen corto: módulo de enrutamiento y simulación urbana basado en grafo H3 para alimentar decisiones de ruta en tiempo real.
+
 Una aplicación de navegación P2P similar a Waze para hackathon.
 
 ## Arquitectura

@@ -1,5 +1,7 @@
 # Place2Place
 
+Short resume: decentralized traffic simulation workspace combining a P2P backend mesh, routing engine, and live map UI.
+
 Peer-to-peer traffic simulation backend bootstrap for Pear/Bare.
 
 ## Backend bootstrap
@@ -37,3 +39,7 @@ Use example scenarios to validate local peer discovery behavior:
 - `npm run example:mock:far` (cars in distant zones, should not connect)
 
 Additional docs live in `examples/mock-directions/README.md`.
+
+## Documentation index
+
+- File-by-file checklist documentation: `docs/FILE_DOCUMENTATION.md`

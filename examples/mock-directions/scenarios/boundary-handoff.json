@@ -1,4 +1,5 @@
 {
+  "fileDescription": "Scenario focused on continuity when a vehicle crosses H3 boundaries and rotates topics.",
   "name": "boundary-handoff",
   "topicNamespace": "place2place-example-boundary-handoff-v1",
   "description": "One car oscillates across an H3 boundary while others stay pinned to each side.",

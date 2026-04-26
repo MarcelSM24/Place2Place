@@ -1,3 +1,6 @@
+/**
+ * Shared runtime configuration for simulation cadence, default positions, and local storage naming.
+ */
 export const SIMULATION_CONFIG = {
   tickMs: 1000,
   h3Resolution: 12,

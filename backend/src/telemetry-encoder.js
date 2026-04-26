@@ -1,3 +1,6 @@
+/**
+ * Minimal fixed-size telemetry codec (19 bytes) used for compact peer-local event storage.
+ */
 import c from "compact-encoding";
 
 export const TELEMETRY_PAYLOAD_BYTES = 19;

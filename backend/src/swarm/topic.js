@@ -1,3 +1,7 @@
+/**
+ * Geographic discovery topic derivation:
+ * converts lat/lon into H3 and hashes it to a 32-byte Hyperswarm topic.
+ */
 import { createHash } from "node:crypto";
 import { latLngToCell } from "h3-js";
 

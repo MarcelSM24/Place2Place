@@ -1,3 +1,7 @@
+/**
+ * Main browser client:
+ * renders map/vehicles and coordinates decentralized PeerJS-based route and telemetry exchange.
+ */
 import * as h3 from 'https://esm.sh/h3-js@4.1.0';
 import createGraph from 'https://esm.sh/ngraph.graph@20.1.2';
 import * as path from 'https://esm.sh/ngraph.path@1.6.1';
@@ -134,6 +138,12 @@ function updateEdgeWeight(fromHex, toHex, weight) {
 // ---------------------------
 // 2. Local Simulation State
 // ---------------------------
+/**
+ * Simulated vehicle entity used by the frontend traffic demo.
+ *
+ * The instance advances along a precomputed H3 route and adapts speed according
+ * to congestion signals embedded in the local graph weights.
+ */
 class Vehicle {
     constructor(id, startHex, route) {
         this.id = id;

@@ -1,3 +1,6 @@
+/**
+ * Corestore bootstrap helpers for creating, reading, and closing local telemetry Hypercores.
+ */
 import fs from "node:fs/promises";
 import path from "node:path";
 import Corestore from "corestore";

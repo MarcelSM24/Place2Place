@@ -1,3 +1,6 @@
+/**
+ * Ephemeral key lifecycle manager that rotates cryptographic identity by time or H3 boundary changes.
+ */
 import { randomBytes, generateKeyPairSync } from "node:crypto";
 
 const DEFAULT_ROTATION_MS = 10 * 60 * 1000;

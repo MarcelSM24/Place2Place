@@ -1,7 +1,16 @@
+/**
+ * Mesh wrapper over Hyperswarm that handles topic rotation as a node moves between H3 cells.
+ */
 import Hyperswarm from "hyperswarm";
 import b4a from "b4a";
 import { deriveDiscoveryTopic } from "./topic.js";
 
+/**
+ * Maintains the local Hyperswarm mesh membership for a moving peer.
+ *
+ * A node joins a discovery topic derived from its current H3 cell and rotates
+ * topics when the position crosses into a different cell.
+ */
 export class SwarmMesh {
   constructor({ h3Resolution, nodeLabel = "node", topicNamespace = "" }) {
     this.h3Resolution = h3Resolution;

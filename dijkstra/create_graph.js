@@ -1,3 +1,6 @@
+/**
+ * Builds a navigable H3 graph from Barcelona OSM street geometry with directional edge rules.
+ */
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';

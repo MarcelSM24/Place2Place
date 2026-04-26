@@ -1,3 +1,6 @@
+/**
+ * Vehicle simulation primitives used to emit movement-derived telemetry over routing paths.
+ */
 import h3 from 'h3-js';
 
 export class Vehicle {

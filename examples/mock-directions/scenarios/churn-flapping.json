@@ -1,4 +1,5 @@
 {
+  "fileDescription": "Scenario stressing churn with frequent join/leave behavior near topic edges.",
   "name": "churn-flapping",
   "topicNamespace": "place2place-example-churn-flapping-v1",
   "description": "Multiple cars move around the same metro area with frequent topic changes near H3 boundaries.",

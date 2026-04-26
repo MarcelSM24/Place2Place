@@ -1,3 +1,7 @@
+/**
+ * Autobase traffic log orchestration:
+ * merges telemetry and dynamic writer membership into a verified shared view.
+ */
 import c from "compact-encoding";
 import b4a from "b4a";
 import Autobase from "autobase";

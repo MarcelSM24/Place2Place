@@ -1,3 +1,7 @@
+/**
+ * Gateway runtime entrypoint:
+ * serves the frontend, spawns peer workers, and mirrors aggregated P2P traffic to WebSocket clients.
+ */
 import { SIMULATION_CONFIG, STORAGE_CONFIG } from "./config.js";
 import { initStorage } from "./storage/corestore.js";
 import { SwarmMesh } from "./swarm/mesh.js";

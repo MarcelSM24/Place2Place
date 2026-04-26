@@ -1,3 +1,7 @@
+/**
+ * Autonomous peer process:
+ * simulates movement, joins geographic swarm topics, publishes signed telemetry, and reacts to congestion.
+ */
 import h3 from "h3-js";
 import { generateKeyPairSync } from "node:crypto";
 import { SIMULATION_CONFIG, STORAGE_CONFIG } from "./config.js";

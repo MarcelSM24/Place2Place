@@ -1,3 +1,6 @@
+/**
+ * Scenario runner for local mock cars that validates topic proximity behavior through scripted routes.
+ */
 import fs from "node:fs/promises";
 import path from "node:path";
 import { createPathGenerator, estimateSpeedKmh } from "../../backend/src/sim/path.js";

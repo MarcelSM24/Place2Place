@@ -1,5 +1,7 @@
 # Mock Directions Examples
 
+Short resume: reproducible scenario pack to validate topic-based peer discovery and mesh behavior.
+
 These scenarios help validate whether peer discovery behaves correctly with mocked car directions.
 
 ## Run commands

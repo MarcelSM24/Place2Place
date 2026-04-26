@@ -1,3 +1,6 @@
+/**
+ * Lightweight static server for the browser demo assets.
+ */
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';

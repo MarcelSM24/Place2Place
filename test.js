@@ -1,3 +1,6 @@
+/**
+ * Root integration tests for encoding, Autobase convergence, and launcher/peer process behavior.
+ */
 import os from "node:os";
 import path from "node:path";
 import fs from "node:fs/promises";

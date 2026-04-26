@@ -1,3 +1,6 @@
+/**
+ * Compact telemetry schema definition used by routing simulation payloads.
+ */
 import c from 'compact-encoding'
 
 // Estructura oficial de 19 bytes definida en vuestro estudio de viabilidad

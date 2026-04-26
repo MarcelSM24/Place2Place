@@ -1,3 +1,6 @@
+/**
+ * Shared telemetry payload format with witness signatures and optional local differential privacy noise.
+ */
 import c from "compact-encoding";
 import b4a from "b4a";
 import {

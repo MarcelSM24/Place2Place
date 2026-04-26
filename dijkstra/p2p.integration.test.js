@@ -1,3 +1,6 @@
+/**
+ * Integration test ensuring simulated route telemetry replicates through the Autobase P2P layer.
+ */
 import os from "node:os";
 import path from "node:path";
 import fs from "node:fs/promises";
