@@ -1,4 +1,5 @@
 {
+  "fileDescription": "Scenario where nearby vehicles should share topic space and discover peers quickly.",
   "name": "same-cell",
   "topicNamespace": "place2place-example-same-cell-v1",
   "description": "Two cars start nearby and should quickly discover each other.",

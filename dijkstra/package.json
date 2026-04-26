@@ -1,4 +1,5 @@
 {
+  "description": "Routing-focused module for H3 graph generation, pathfinding, and local demo serving.",
   "type": "module",
   "dependencies": {
     "compact-encoding": "^3.0.0",

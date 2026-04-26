@@ -1,3 +1,6 @@
+/**
+ * High-level mesh behavior tests covering churn, boundary handoff, dense cells, and multi-hop ferrying.
+ */
 import os from "node:os";
 import path from "node:path";
 import fs from "node:fs/promises";
@@ -17,6 +20,12 @@ const require = createRequire(import.meta.url);
 const { sync } = require("autobase-test-helpers");
 const SCENARIO_DIR = path.resolve("./examples/mock-directions/scenarios");
 
+/**
+ * In-memory test harness that simulates topic-based peer connectivity.
+ *
+ * It emulates Hyperswarm join/leave behavior by wiring Autobase replication
+ * streams only between peers currently sharing the same topic.
+ */
 class TopicReplicationHarness {
   constructor() {
     this.topics = new Map();

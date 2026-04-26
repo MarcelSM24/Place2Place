@@ -1,4 +1,5 @@
 {
+  "fileDescription": "Scenario validating store-carry-forward relay across sparse multi-hop peer chain.",
   "name": "message-ferry-chain",
   "topicNamespace": "place2place-example-message-ferry-chain-v1",
   "description": "A sparse chain where one car ferries observations between distant topic regions.",

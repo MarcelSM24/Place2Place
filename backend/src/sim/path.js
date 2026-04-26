@@ -1,3 +1,6 @@
+/**
+ * Movement helpers for waypoint interpolation and speed estimation between simulation ticks.
+ */
 function interpolate(start, end, fraction) {
   return {
     lat: start.lat + (end.lat - start.lat) * fraction,

@@ -1,3 +1,6 @@
+/**
+ * Routing engine over the H3 graph: path calculation, edge lookups, and dynamic weight updates.
+ */
 import h3 from 'h3-js';
 import { buildNavigableGraph } from './create_graph.js';
 import path from 'ngraph.path';

@@ -1,5 +1,6 @@
 {
   "name": "place2place",
+  "description": "P2P traffic simulation platform with Hyperswarm mesh, Autobase telemetry merge, and map visualization.",
   "version": "0.1.0",
   "private": true,
   "type": "module",

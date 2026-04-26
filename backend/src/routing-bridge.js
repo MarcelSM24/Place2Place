@@ -1,9 +1,18 @@
+/**
+ * Route adaptation bridge that translates traffic telemetry into live graph weight updates and reroutes.
+ */
 import {
   calculateRoute,
   getRouteEdgeIds,
   updateEdgeWeightByEdgeId
 } from "../../dijkstra/routing.js";
 
+/**
+ * Connects incoming telemetry to local route maintenance.
+ *
+ * It updates edge weights from received traffic events and triggers rerouting
+ * when a non-local event affects the currently active route.
+ */
 export class RoutingBridge {
   constructor({ onRouteUpdate }) {
     this.onRouteUpdate = onRouteUpdate;

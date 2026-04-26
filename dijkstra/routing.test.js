@@ -1,3 +1,6 @@
+/**
+ * Routing smoke tests validating H3 conversion and route computation between city points.
+ */
 import test from 'brittle';
 import h3 from 'h3-js';
 import { calculateRoute, getHexFromLatLng } from './routing.js';
