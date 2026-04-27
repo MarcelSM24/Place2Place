@@ -18,6 +18,58 @@ PlaceToPlace is inspired by decentralized communication systems, local-first des
 - Streams aggregated state to the web map through a local WebSocket bridge.
 - Supports dynamic congestion behavior and route adaptation in the interface.
 
+## Setup and run
+
+### 1) Install dependencies
+
+From the project root:
+
+```bash
+npm install
+```
+
+### 2) Start the app
+
+Run the main backend + frontend gateway:
+
+```bash
+npm run backend:start
+```
+
+Then open the map in your browser:
+
+- `http://localhost:3000` (or the next available port shown in the terminal if `3000` is already in use)
+
+Optional helper scripts:
+
+- `npm run routing:start` starts the standalone routing server.
+- `npm run test` runs the test suite.
+
+## How to simulate multiple cars (tabs)
+
+The browser demo supports running multiple car peers from the same machine:
+
+1. Open the app URL in one tab.
+2. Duplicate that tab (or open the same URL in new tabs).
+3. Each tab creates its own peer identity and simulated vehicle.
+4. Move/set routes in different tabs to see telemetry and traffic events propagate between peers.
+
+Tip: open 3-5 tabs to clearly see gossip synchronization and route updates.
+
+## Map line meaning
+
+The simulation uses route line styles/colors to indicate traffic state:
+
+- **Solid red line**: your current normal route.
+- **Dashed blue line**: a route shared by another peer (remote car).
+- **Dashed orange line**: your route was recalculated to avoid congestion.
+- **Dashed dark-red line**: heavy blockage with no good alternative path (you may stay trapped behind a slow vehicle).
+
+Markers:
+
+- **Red marker**: your local car in the current tab.
+- **Blue markers**: cars coming from other peers/tabs.
+
 ## How we built it
 
 - **Spatial discovery:** `h3-js` converts GPS-like coordinates into hex cells so peers discover only relevant neighbors.
